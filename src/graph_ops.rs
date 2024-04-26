@@ -1,5 +1,4 @@
 use rand::{rngs::StdRng, Rng, SeedableRng};
-
 pub type Vertex = usize;
 pub type ListOfEdges = Vec<(Vertex,Vertex)>;
 pub type AdjacencyLists = Vec<Vec<Vertex>>;
