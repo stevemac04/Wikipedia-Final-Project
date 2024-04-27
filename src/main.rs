@@ -1,13 +1,19 @@
 mod graph_ops;
 use graph_ops::{Graph, page_rank};
+use rand::seq::index;
 use std::fs::File;
 use std::io::prelude::*;
 use rand::{Rng, thread_rng};
 use std::collections::HashMap;
 use std::collections::HashSet;
 fn main() {
-    //let (vertex_count, edge_vec) = read_file("links.tsv");
-    //.let data_graph = Graph::create_directed(vertex_count, &edge_vec);
+    let (vertex_count, edge_vec, label_vec, index_vec) = read_file("links.tsv");
+    let data_graph = Graph {
+        n: vertex_count,
+        outedges: edge_vec,
+        vertex_labels: label_vec,
+        vertex_indices: index_vec,
+    };
 
 }
 
