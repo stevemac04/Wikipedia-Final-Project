@@ -2,35 +2,70 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 pub type Vertex = usize;
 pub type ListOfEdges = Vec<(Vertex,Vertex)>;
 pub type AdjacencyLists = Vec<Vec<Vertex>>;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug)]
-// Graph and implied functions are taken from Lecture
 pub struct Graph {
-    pub n: usize, // vertex labels in {0,...,n-1}
-    pub outedges: AdjacencyLists,
+    pub n: usize, // Number of vertices
+    pub outedges: Vec<Vec<usize>>, // Adjacency list representation
+    pub vertex_labels: Vec<String>, // Maps index to vertex label
+    pub vertex_indices: HashMap<String, usize>, // Maps vertex label to index
 }
-impl Graph { 
-    pub fn add_directed_edges(&mut self,
-                          edges:&ListOfEdges) {
-        for (u,v) in edges {
-            self.outedges[*u].push(*v);
+
+impl Graph {
+    pub fn new(vertices: Vec<String>, edges: Vec<(String, String)>) -> Self {
+        let n = vertices.len();
+        let mut vertex_indices = HashMap::new();
+        let mut outedges = vec![vec![]; n];
+        let mut vertex_labels = vec![String::new(); n];
+
+        for (i, vertex) in vertices.into_iter().enumerate() {
+            vertex_indices.insert(vertex.clone(), i);
+            vertex_labels[i] = vertex;
+        }
+
+        for (src, tgt) in edges {
+            let src_idx = *vertex_indices.get(&src).unwrap();
+            let tgt_idx = *vertex_indices.get(&tgt).unwrap();
+            outedges[src_idx].push(tgt_idx);
+        }
+
+        Graph {
+            n,
+            outedges,
+            vertex_labels,
+            vertex_indices,
+        }
+    }
+
+    pub fn add_directed_edges(&mut self, edges: &ListOfEdges) {
+        for (u, v) in edges {
+            if *u < self.n && *v < self.n {
+                self.outedges[*u].push(*v);
+            }
         }
     }
 
     pub fn sort_graph_lists(&mut self) {
         for l in self.outedges.iter_mut() {
-            l.sort();
+            l.sort_unstable();
         }
     }
-    pub fn create_directed(n:usize,edges:&ListOfEdges)
-                                            -> Graph {
-        let mut g = Graph{n,outedges:vec![vec![];n]};
+
+    pub fn create_directed(n: usize, edges: &ListOfEdges) -> Graph {
+        let mut g = Graph {
+            n,
+            outedges: vec![vec![]; n],
+            vertex_labels: vec![String::new(); n],
+            vertex_indices: HashMap::new(),
+        };
         g.add_directed_edges(edges);
         g.sort_graph_lists();
-        g                                        
+        g
     }
 }
-
+    
 
 pub fn page_rank(graph: Graph, num_vertices: usize, seed: u64) -> Vec<(usize, usize)>{
     let mut rng = StdRng::seed_from_u64(seed); // set seed
