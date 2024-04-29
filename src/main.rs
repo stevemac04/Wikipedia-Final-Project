@@ -33,13 +33,13 @@ fn read_file(path: &str) -> (usize, Vec<Vec<usize>>, Vec<String>, HashMap<String
         }
         let source = parts[0].to_string();
         let target = parts[1].to_string();
-        // Insert source vertex if it's not already included
+        // insert source vertex if it's not already included
         if !vertex_indices.contains_key(&source) {
             vertex_indices.insert(source.clone(), vertex_labels.len());
             vertex_labels.push(source.clone());
         }
 
-        // Insert target vertex if it's not already included
+        // insert target vertex if it's not already included
         if !vertex_indices.contains_key(&target) {
             vertex_indices.insert(target.clone(), vertex_labels.len());
             vertex_labels.push(target.clone());
@@ -74,7 +74,7 @@ mod tests  {
             vertex_indices: vertex_indices,
         };
 
-        // Mapping team names to indices as they would be read and stored in the vertex_map
+        // mapping team names to indices as they would be read and stored in the vertex_map
         let team_indices = [
             ("Penguins", 0),
             ("Flyers", 1),
@@ -89,7 +89,7 @@ mod tests  {
             ("Flames", 10),
         ].iter().cloned().collect::<HashMap<&str, usize>>();
     
-        // Setting up the expected outedges
+        // setting up the expected outedges
         let mut expected_outedges = vec![vec![]; 11]; // 11 teams total
         expected_outedges[team_indices["Penguins"]] = vec![team_indices["Flyers"]];
         expected_outedges[team_indices["Flyers"]] = vec![team_indices["Rangers"], team_indices["Blackhawks"]];
@@ -115,13 +115,13 @@ mod tests  {
         ].iter().cloned().map(|(k, v)| (k.to_string(), v)).collect();
     
         let expected_graph = Graph {
-            n: 11, // Total number of teams
+            n: 11, // hard code 11 total teams expected
             outedges: expected_outedges,
             vertex_labels: expected_vertex_labels,
             vertex_indices: expected_vertex_indices,
         };
     
-        // Compare the actual graph with the expected graph using assert_eq!()
+        // compare the actual graph values with the expected graph values using assert_eq!()
         assert_eq!(test_graph.n, expected_graph.n);
         assert_eq!(test_graph.outedges, expected_graph.outedges);
         assert_eq!(test_graph.vertex_labels, expected_graph.vertex_labels);

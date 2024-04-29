@@ -7,10 +7,10 @@ use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct Graph {
-    pub n: usize, // Number of vertices
-    pub outedges: Vec<Vec<usize>>, // Adjacency list representation
-    pub vertex_labels: Vec<String>, // Maps index to vertex label
-    pub vertex_indices: HashMap<String, usize>, // Maps vertex label to index
+    pub n: usize, // number of vertices
+    pub outedges: Vec<Vec<usize>>, // adjacency list representation
+    pub vertex_labels: Vec<String>, // maps index to vertex label
+    pub vertex_indices: HashMap<String, usize>, // maps vertex label to index
 }
 
 impl Graph {
@@ -66,19 +66,17 @@ impl Graph {
     }
 }
     
-
-pub fn page_rank(graph: Graph, num_vertices: usize, seed: u64) -> Vec<(usize, usize)>{
+pub fn page_rank(graph: &Graph, seed: u64) -> Vec<(String, usize)> {
     let mut rng = StdRng::seed_from_u64(seed); // set seed
-    let mut end_counts: Vec<(usize, usize)> = Vec::new(); //empty vector with end_counts and vertex labels
-    for i in 0..num_vertices {
-        end_counts.push((i, 0)); // put vertex labels into vector
-    }
-    for vertex in 0..num_vertices { // iterate through each vertex
-        let mut current_vertex = vertex; // current_vertex to keep track through walks
+    let num_vertices = graph.n;
+    let mut end_counts: Vec<(String, usize)> = graph.vertex_labels.iter().map(|label| (label.clone(), 0)).collect(); // initialize with labels and zero counts
+
+    for i in 0..num_vertices { // iterate through each vertex by index
+        let mut current_vertex = i; // current_vertex to keep track through walks
         for _ in 0..100 { // each vertex must be iterated through 100 walks
             for _ in 0..100 { // 100 steps per walk
                 let x: i32 = rng.gen_range(1..=10) as i32; // Use seeded RNG for 1-10
-                let current_len: usize = graph.outedges[current_vertex].len() as usize; // the amount of outedges that the current vertex has
+                let current_len: usize = graph.outedges[current_vertex].len(); // the amount of outedges that the current vertex has
                 if current_len == 0 || x == 1 { // options where we must jump to a new vertex
                     current_vertex = rng.gen_range(0..num_vertices); // jump to random vertex
                 } else {
@@ -91,4 +89,3 @@ pub fn page_rank(graph: Graph, num_vertices: usize, seed: u64) -> Vec<(usize, us
     end_counts.sort_by_key(|&(_, count)| std::cmp::Reverse(count)); // sort the count vector by which vertices have the highest counts
     end_counts
 }
-
