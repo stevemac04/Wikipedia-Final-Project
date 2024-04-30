@@ -201,4 +201,24 @@ mod tests  {
         ];
         assert_eq!(actual_result, expected_result);
     }
+    #[test]
+    fn test_min_distance() {
+        let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
+
+        let test_graph = Graph {
+            n: vertex_count,
+            outedges: outedges,
+            vertex_labels: vertex_labels,
+            vertex_indices: vertex_indices,
+        };
+
+        let start_label = "Oilers";
+        let end_label = "Bruins";
+
+        let distance_option = test_graph.min_distance(start_label, end_label);
+        let actual_distance = distance_option.unwrap();
+
+        let expected_distance: u32 = 5;
+        assert_eq!(actual_distance, expected_distance);
+    }
 }
