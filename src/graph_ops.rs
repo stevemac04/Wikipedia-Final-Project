@@ -64,6 +64,31 @@ impl Graph {
         g.sort_graph_lists();
         g
     }
+    pub fn bfs(&self, start: Vertex) -> Vec<Option<u32>> { // help from lecture 28
+        let mut distance: Vec<Option<u32>> = vec![None; self.n];
+        distance[start] = Some(0);
+        let mut queue: VecDeque<Vertex> = VecDeque::new();
+        queue.push_back(start);
+
+        while let Some(v) = queue.pop_front() {
+            for &u in &self.outedges[v] {
+                if distance[u].is_none() {
+                    distance[u] = Some(distance[v].unwrap() + 1);
+                    queue.push_back(u);
+                }
+            }
+        }
+
+        distance
+    }
+
+    pub fn min_distance(&self, start_label: &str, end_label: &str) -> Option<u32> {
+        let start_index = self.vertex_indices.get(start_label)?;
+        let end_index = self.vertex_indices.get(end_label)?;
+
+        let distances = self.bfs(*start_index);
+        distances[*end_index]
+    }
 }
     
 pub fn page_rank(graph: &Graph, seed: u64) -> Vec<(String, usize)> {
