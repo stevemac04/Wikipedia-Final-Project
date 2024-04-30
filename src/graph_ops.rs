@@ -4,6 +4,7 @@ pub type ListOfEdges = Vec<(Vertex,Vertex)>;
 pub type AdjacencyLists = Vec<Vec<Vertex>>;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 #[derive(Debug)]
 pub struct Graph {

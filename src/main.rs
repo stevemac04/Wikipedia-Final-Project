@@ -6,6 +6,7 @@ use std::io::prelude::*;
 use rand::{Rng, thread_rng};
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::collections::VecDeque;
 fn main() {
     let (vertex_count, edge_vec, label_vec, index_vec) = read_file("links.tsv");
     let data_graph = Graph {
@@ -133,7 +134,7 @@ mod tests  {
         assert_eq!(test_graph.vertex_indices, expected_graph.vertex_indices);
     }
     #[test]
-    fn test_page_rank(){
+    fn test_page_rank() {
         let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
 
         let test_graph = Graph {
@@ -169,5 +170,35 @@ mod tests  {
             assert_eq!(actual_label, expected_label);
             assert_eq!(rounded_actual_percent, *expected_percent);
         }
+    }
+    #[test]
+    fn test_bfs() {
+        let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
+
+        let test_graph = Graph {
+            n: vertex_count,
+            outedges: outedges,
+            vertex_labels: vertex_labels,
+            vertex_indices: vertex_indices,
+        };
+        let start_label = "Flyers";
+        let start_index = *test_graph.vertex_indices.get(start_label).expect("Doesn't exist");
+
+        let actual_result = test_graph.bfs(start_index);
+
+        let expected_result = vec![
+            Some(2), // Distance to vertex 0
+            Some(0), // Distance to vertex 1 (itself)
+            Some(1), // Distance to vertex 2
+            Some(1), // Distance to vertex 3
+            Some(2), // Distance to vertex 4
+            None, // Unreachable
+            None, // Unreachable
+            None, // Unreachable
+            None, // Unreachable
+            None, // Unreachable
+            None, // Unreachable
+        ];
+        assert_eq!(actual_result, expected_result);
     }
 }
