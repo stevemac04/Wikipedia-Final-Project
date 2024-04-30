@@ -14,7 +14,11 @@ fn main() {
         vertex_labels: label_vec,
         vertex_indices: index_vec,
     };
-
+    //println!("Top 5 most common ending vertices:");
+    //for (index, count) in actual_results.iter().take() { // take the top 5 counts
+        //let count_fraction = *count as f64 / (100.0 * vertex_count as f64); // change to a decimal (percentage) of the total walks
+        //println!("vertex {}: approximate pagerank = {:.4}", index, count_fraction); //print
+    //}
 }
 
 fn read_file(path: &str) -> (usize, Vec<Vec<usize>>, Vec<String>, HashMap<String, usize>) {
@@ -63,6 +67,7 @@ fn read_file(path: &str) -> (usize, Vec<Vec<usize>>, Vec<String>, HashMap<String
 #[cfg(test)]
 mod tests  {
     use super::*;
+    use float_cmp::approx_eq;
     #[test]
     fn test_read_graph() {
         let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
@@ -126,5 +131,43 @@ mod tests  {
         assert_eq!(test_graph.outedges, expected_graph.outedges);
         assert_eq!(test_graph.vertex_labels, expected_graph.vertex_labels);
         assert_eq!(test_graph.vertex_indices, expected_graph.vertex_indices);
+    }
+    #[test]
+    fn test_page_rank(){
+        let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
+
+        let test_graph = Graph {
+            n: vertex_count,
+            outedges: outedges,
+            vertex_labels: vertex_labels,
+            vertex_indices: vertex_indices,
+        };
+
+        let actual_results = page_rank(&test_graph, 42);
+        let expected_results = vec![
+            ("Flyers", 0.2155),
+            ("Blackhawks", 0.1136),
+            ("Penguins", 0.1055),
+            ("Rangers", 0.1027),
+            ("Red_Wings", 0.0864),
+            ("Senators", 0.0800),
+            ("Canadiens", 0.0691),
+            ("Flames", 0.0655),
+            ("Bruins", 0.0618),
+            ("Oilers", 0.0555),
+            ("Maple_Leafs", 0.0445)
+        ];
+
+        // compare actual with expected
+        for (i, (actual_label, actual_count)) in actual_results.iter().enumerate() {
+            let (expected_label, expected_percent) = &expected_results[i];
+            let count_percent = *actual_count as f64 / (100.0 * vertex_count as f64);
+
+            let scale = 10000.0; // 10^4 for 4 decimal places (for rounding)
+            let rounded_actual_percent = (count_percent * scale).round() / scale;
+
+            assert_eq!(actual_label, expected_label);
+            assert_eq!(rounded_actual_percent, *expected_percent);
+        }
     }
 }
