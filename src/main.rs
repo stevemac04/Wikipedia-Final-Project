@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 fn main() {
+    let mut rng = thread_rng(); // for seed
+    let r_seed: u64 = rng.gen(); // for seed
     let (vertex_count, edge_vec, label_vec, index_vec) = read_file("links.tsv");
     let data_graph = Graph {
         n: vertex_count,
@@ -15,11 +17,51 @@ fn main() {
         vertex_labels: label_vec,
         vertex_indices: index_vec,
     };
-    //println!("Top 5 most common ending vertices:");
-    //for (index, count) in actual_results.iter().take() { // take the top 5 counts
-        //let count_fraction = *count as f64 / (100.0 * vertex_count as f64); // change to a decimal (percentage) of the total walks
-        //println!("vertex {}: approximate pagerank = {:.4}", index, count_fraction); //print
-    //}
+    
+    // PAGE RANK
+    let page_rank_return = page_rank(&data_graph, r_seed);
+    println!("Top 5 most common ending vertices:");
+    for (index, count) in page_rank_return.iter().take(5) { // take the top 5 counts
+        let count_fraction = *count as f64 / (100.0 * vertex_count as f64); // change to a decimal (percentage) of the total walks
+        println!("vertex {}: approximate pagerank = {:.4}", index, count_fraction); //print
+    }
+
+    // MIN DISTANCE
+    let mut input = String::new();
+    println!("Enter the first article name:");
+    std::io::stdin().read_line(&mut input).expect("Failed to read line");
+    let article1 = input.trim().to_string();
+    input.clear();
+
+    println!("Enter the second article name:");
+    std::io::stdin().read_line(&mut input).expect("Failed to read line");
+    let article2 = input.trim().to_string();
+
+    if data_graph.vertex_indices.contains_key(&article1) && data_graph.vertex_indices.contains_key(&article2) {
+        let distance = data_graph.min_distance(&article1, &article2);
+        match distance {
+            Some(d) => println!("The distance between '{}' and '{}' is {}", article1, article2, d),
+            None => println!("No path exists between '{}' and '{}'", article1, article2),
+        }
+    } else {
+        if !data_graph.vertex_indices.contains_key(&article1) {
+            println!("Article '{}' does not exist in the graph.", article1);
+        }
+        if !data_graph.vertex_indices.contains_key(&article2) {
+            println!("Article '{}' does not exist in the graph.", article2);
+        }
+    }
+    // CONNECTED COMPONENTS
+
+    // GRAPH SPLIT
+
+    // SEPARATION
+    let degree_separation = data_graph.max_degree_of_separation();
+
+    match degree_separation {
+        Some(value) => println!("The maximum degree of separation between any two articles is '{}'.", value),
+        None => println!("The graph is not entirely connected."),
+    }
 }
 
 fn read_file(path: &str) -> (usize, Vec<Vec<usize>>, Vec<String>, HashMap<String, usize>) {
@@ -31,6 +73,7 @@ fn read_file(path: &str) -> (usize, Vec<Vec<usize>>, Vec<String>, HashMap<String
     let mut vertex_indices: HashMap<String, usize> = HashMap::new();
 
     for line in buf_reader {
+        // if line.starts_with("#") or empty
         let line = line.expect("Could not read line");
         let parts: Vec<&str> = line.trim().split('\t').collect();
         if parts.len() != 2 {
@@ -220,5 +263,33 @@ mod tests  {
 
         let expected_distance: u32 = 5;
         assert_eq!(actual_distance, expected_distance);
+    }
+    #[test]
+    fn test_max_separation() {
+        let (vertex_count, outedges, vertex_labels, vertex_indices) = read_file("test.tsv");
+
+        let test_graph = Graph {
+            n: vertex_count,
+            outedges: outedges,
+            vertex_labels: vertex_labels,
+            vertex_indices: vertex_indices,
+        };
+
+        let degree_separation = test_graph.max_degree_of_separation();
+        assert_eq!(degree_separation, None);
+    }
+    #[test]
+    fn test_connected_components() {
+        let (vertex_count, edge_vec, label_vec, index_vec) = read_file("links.tsv");
+        let data_graph = Graph {
+            n: vertex_count,
+            outedges: edge_vec,
+            vertex_labels: label_vec,
+            vertex_indices: index_vec,
+        };
+        let components = data_graph.connected_components();
+        for (i, component) in components.iter().enumerate() {
+            println!("Component {}: {:?}", i + 1, component);
+        }
     }
 }

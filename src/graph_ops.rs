@@ -90,6 +90,54 @@ impl Graph {
         let distances = self.bfs(*start_index);
         distances[*end_index]
     }
+
+    pub fn max_degree_of_separation(&self) -> Option<u32> {
+        let mut max_separation = 0;
+    
+        // Perform BFS from each vertex to find the maximum distance to any other vertex
+        for start in 0..self.n {
+            let distances = self.bfs(start);
+            if distances.iter().any(|d| d.is_none()) {
+                println!("Vertex {} cannot reach all other vertices.", start);
+                return None; // If any vertex is unreachable, return None
+            }
+            for distance in distances.iter().flatten() {
+                if *distance > max_separation {
+                    max_separation = *distance;
+                }
+            }
+        }
+    
+        Some(max_separation)
+    }
+    
+    pub fn connected_components(&self) -> Vec<Vec<String>> {
+        let mut visited = vec![false; self.n];
+        let mut components = Vec::new();
+
+        for start in 0..self.n {
+            if !visited[start] {
+                let mut component = Vec::new();
+                let mut stack = vec![start];
+
+                while let Some(vertex) = stack.pop() {
+                    if !visited[vertex] {
+                        visited[vertex] = true;
+                        component.push(self.vertex_labels[vertex].clone());  // Store the vertex label instead of the index
+                        for &neighbor in &self.outedges[vertex] {
+                            if !visited[neighbor] {
+                                stack.push(neighbor);
+                            }
+                        }
+                    }
+                }
+
+                components.push(component);
+            }
+        }
+
+        components
+    }
 }
     
 pub fn page_rank(graph: &Graph, seed: u64) -> Vec<(String, usize)> {
