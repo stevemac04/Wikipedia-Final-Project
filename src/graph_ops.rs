@@ -1,10 +1,10 @@
 use rand::{rngs::StdRng, Rng, SeedableRng};
+use std::collections::HashMap;
+use std::collections::VecDeque;
 pub type Vertex = usize;
 pub type ListOfEdges = Vec<(Vertex,Vertex)>;
+#[allow(dead_code)]
 pub type AdjacencyLists = Vec<Vec<Vertex>>;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
 
 #[derive(Debug)]
 pub struct Graph {

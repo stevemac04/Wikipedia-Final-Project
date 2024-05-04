@@ -1,12 +1,12 @@
 mod graph_ops;
 use graph_ops::{Graph, page_rank};
-use rand::seq::index;
+
 use std::fs::File;
 use std::io::prelude::*;
 use rand::{Rng, thread_rng};
 use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
+
+
 fn main() {
     let mut rng = thread_rng(); // for seed
     let r_seed: u64 = rng.gen(); // for seed
