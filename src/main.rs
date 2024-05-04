@@ -52,11 +52,12 @@ fn main() {
         }
     }
     // CONNECTED COMPONENTS
-
+    let components = data_graph.connected_components();
     // GRAPH SPLIT
-
+    let main_component = &components[0];  // Get the first component (the main component of our graph)
+    let subgraph = data_graph.create_subgraph(main_component); // Create a subgraph from the first component
     // SEPARATION
-    let degree_separation = data_graph.max_degree_of_separation();
+    let degree_separation = subgraph.max_degree_of_separation();
 
     match degree_separation {
         Some(value) => println!("The maximum degree of separation between any two articles is '{}'.", value),
@@ -279,17 +280,15 @@ mod tests  {
         assert_eq!(degree_separation, None);
     }
     #[test]
-    fn test_connected_components() {
-        let (vertex_count, edge_vec, label_vec, index_vec) = read_file("links.tsv");
-        let data_graph = Graph {
-            n: vertex_count,
-            outedges: edge_vec,
-            vertex_labels: label_vec,
-            vertex_indices: index_vec,
+    fn test_separation_alternate() {
+        let test_graph = Graph {
+            n: 3,
+            outedges: vec![vec![1], vec![2], vec![0]], // A simple triangle graph
+            vertex_labels: vec!["A".to_string(), "B".to_string(), "C".to_string()],
+            vertex_indices: HashMap::from([("A".to_string(), 0), ("B".to_string(), 1), ("C".to_string(), 2)]),
         };
-        let components = data_graph.connected_components();
-        for (i, component) in components.iter().enumerate() {
-            println!("Component {}: {:?}", i + 1, component);
-        }
+    
+        let max_sep = test_graph.max_degree_of_separation();
+        println!("Max degree of separation: {:?}", max_sep);
     }
 }

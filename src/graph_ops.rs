@@ -14,6 +14,7 @@ pub struct Graph {
     pub vertex_indices: HashMap<String, usize>, // maps vertex label to index
 }
 
+#[allow(dead_code)]
 impl Graph {
     pub fn new(vertices: Vec<String>, edges: Vec<(String, String)>) -> Self {
         let n = vertices.len();
@@ -65,6 +66,40 @@ impl Graph {
         g.sort_graph_lists();
         g
     }
+    pub fn create_subgraph(&self, component: &[String]) -> Graph { // This method is to create a subgraph of the main component of the original graph
+        let mut subgraph_indices = HashMap::new();
+        let mut subgraph_outedges = Vec::new();
+        let mut subgraph_labels = Vec::new();
+
+        // Assign new indices to the vertices in the component
+        for (new_index, label) in component.iter().enumerate() {
+            subgraph_indices.insert(label.clone(), new_index);
+            subgraph_labels.push(label.clone());
+        }
+
+        // Build the adjacency list for the subgraph
+        for label in component {
+            let original_index = self.vertex_indices[label];
+            let _new_index = subgraph_indices[label];
+            let mut edges = Vec::new();
+
+            for &neighbor_index in &self.outedges[original_index] {
+                let neighbor_label = &self.vertex_labels[neighbor_index];
+                if subgraph_indices.contains_key(neighbor_label) {
+                    edges.push(subgraph_indices[neighbor_label]);
+                }
+            }
+            subgraph_outedges.push(edges);
+        }
+
+        Graph {
+            n: component.len(),
+            outedges: subgraph_outedges,
+            vertex_labels: subgraph_labels,
+            vertex_indices: subgraph_indices,
+        }
+    }
+
     pub fn bfs(&self, start: Vertex) -> Vec<Option<u32>> { // help from lecture 28
         let mut distance: Vec<Option<u32>> = vec![None; self.n];
         distance[start] = Some(0);
